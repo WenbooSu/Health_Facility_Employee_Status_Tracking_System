@@ -5,5 +5,3 @@ $db = getConnect();
 $sql = "SELECT * FROM Employees";
 $result = $db->query($sql);
 displayEmp($result);
-
-
