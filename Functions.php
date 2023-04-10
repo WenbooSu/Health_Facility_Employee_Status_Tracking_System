@@ -109,6 +109,42 @@ function displaySch($result) {
         echo "No results found.";
     }
 }
+
+function checkScheduleConflict($db, $EID, $new_start_time, $new_end_time, $new_date) {
+    $sql = "SELECT * FROM Schedule WHERE EID = '$EID' AND date = '$new_date'";
+    $result = $db->query($sql);
+
+    while ($row = $result->fetch_assoc()) {
+        $existing_start_time = strtotime($row['start_time']);
+        $existing_end_time = strtotime($row['end_time']);
+        $new_start = strtotime($new_start_time);
+        $new_end = strtotime($new_end_time);
+
+        if (($new_start >= $existing_start_time && $new_start < $existing_end_time) ||
+            ($new_end > $existing_start_time && $new_end <= $existing_end_time) ||
+            ($new_start <= $existing_start_time && $new_end >= $existing_end_time)) {
+            return true; // conflict detected
+        }
+    }
+
+    return false; // no conflict
+}
+
+function isDocNurse($db, $EID)
+{
+    $sql = "SELECT * FROM Employees WHERE EID = '$EID'";
+    $result = $db->query($sql);
+    $row = $result->fetch_assoc();
+    if($row['role'] == 'doctor' || $row['role'] == 'nurse')
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 function displayInf($result) {
     if ($result->num_rows > 0) {
         // Start the HTML table
